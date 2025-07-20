@@ -1,39 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Home</title>
-  <style>
-    body {
-      background-color:green;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      height: 100vh;
-      color: black;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      font-family: sans-serif;
-      text-shadow: 1px 1px 4px black;
-    }
-    a {
-      margin-top: 20px;
-      padding: 10px 25px;
-      background-color: rgba(0, 128, 0, 0.3);
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
-      border-radius: 8px;
-    }
-    a:hover {
-      background-color: rgba(0, 128, 0, 0.3);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Enchanted Wings: Marvels of Butterfly Species</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to top, #f3e5f5 30%, #e1bee7 100%);
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+            color: #4a148c;
+        }
+
+        h1 {
+            margin-top: 40px;
+            font-size: 34px;
+            font-weight: bold;
+            color: #6a1b9a;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            width: 60%;
+            max-width: 400px;
+            margin: 10px 0;
+            border: 2px solid #ce93d8;
+            border-radius: 6px;
+            background-color: #f8bbd0;
+        }
+
+        button {
+            background-color: #8e24aa;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #6a1b9a;
+        }
+
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, #8bc34a, #aed581);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .static-butterfly {
+            position: absolute;
+            font-size: 30px;
+        }
+
+        .b1 { top: 15%; left: 10%; transform: rotate(-20deg); }
+        .b2 { top: 30%; left: 80%; transform: rotate(10deg); }
+        .b3 { top: 50%; left: 20%; transform: rotate(-15deg); }
+        .b4 { top: 70%; left: 60%; transform: rotate(20deg); }
+        .b5 { top: 85%; left: 30%; transform: rotate(-10deg); }
+    </style>
 </head>
 <body>
-  <h2>Smart Butterfly Classification</h2>
-  <a href="/predict">Go to Prediction Page</a>
+
+    <div class="static-butterfly b1">🦋</div>
+    <div class="static-butterfly b2">🦋</div>
+    <div class="static-butterfly b3">🦋</div>
+    <div class="static-butterfly b4">🦋</div>
+    <div class="static-butterfly b5">🦋</div>
+
+    <h1>Enchanted Wings: Marvels of Butterfly Species</h1>
+
+    <!-- Upload Form -->
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <label for="image">Upload Butterfly Image:</label><br>
+        <input type="file" id="image" name="file" accept="image/*" required>
+        <br><br>
+        <button type="submit">Predict Species</button>
+    </form>
+
+    <div class="grass"></div>
 </body>
 </html>
