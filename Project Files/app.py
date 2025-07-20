@@ -1,53 +1,61 @@
-from flask import Flask, request, render_template, url_for
-from tensorflow.keras.models import load_model 
-from tensorflow.keras.preprocessing import image 
-import numpy as np
 import os
-import uuid
-import PIL
-app = Flask(__name__)
-model = load_model("butterfly_mobilenetv2_model.h5")
-class_labels = ['AMERICAN SNOOT', 'SCARCE SWALLOW', 'WHITE LINED SPHINX MOTH', 'ZEBRA LONG WING']
-STATIC_DIR = "/Users/akhil/Desktop/butterfly-classification/butterfly_classifier_app/static"
-os.makedirs(STATIC_DIR, exist_ok=True)
+import numpy as np
+import pandas as pd
+from flask import Flask, render_template, request
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+from sklearn.preprocessing import LabelEncoder
 
+# Initialize Flask app
+app = Flask(__name__)
+
+# Load the trained model
+model = load_model("butterfly_model.h5")
+
+# Load training_set.csv for label mapping
+df = pd.read_csv("dataset/training_set.csv")
+le = LabelEncoder()
+df['label_encoded'] = le.fit_transform(df['label'])
+label_map = dict(zip(df['label_encoded'], df['label']))
+
+# Image preprocessing function
+def preprocess_image(img_path):
+    img = image.load_img(img_path, target_size=(224, 224))  # Resize to match model input
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    return img_array
+
+# Home route
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route('/predict', methods=['GET', 'POST'])
+# Predict route
+@app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return "No file part in request."
+    if 'file' not in request.files:
+        return 'No file part in request'
 
-        file = request.files['file']
-        if file.filename == '':
-            return "No file selected."
+    file = request.files['file']
 
-        if not file.mimetype.startswith("image"):
-            return "❌ Only image files are allowed. Please upload JPG or PNG."
-        unique_filename = f"{uuid.uuid4().hex}_{file.filename}"
-        filepath = os.path.join(STATIC_DIR, unique_filename)
-        file.save(filepath)
-        try:
-            img = image.load_img(filepath, target_size=(224, 224))
-        except PIL.UnidentifiedImageError:
-            return "⚠️ The uploaded file could not be identified as an image."
+    if file.filename == '':
+        return 'No selected file'
 
-        img_array = image.img_to_array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+    if file:
+        filename = file.filename
+        file_path = os.path.join('static', filename)
+        file.save(file_path)
+
+        # Preprocess and predict
+        img_array = preprocess_image(file_path)
         prediction = model.predict(img_array)
-        class_index = int(np.argmax(prediction))
+        predicted_index = np.argmax(prediction, axis=1)[0]
+        predicted_species = label_map.get(predicted_index, "Unknown")
 
-        if class_index >= len(class_labels):
-            return f"⚠️ Predicted class index {class_index} is out of range."
+        return render_template('result.html',
+                               prediction=predicted_species,
+                               uploaded_image=filename)
 
-        result = class_labels[class_index]
-
-        return render_template("result.html", prediction=result, image_path=unique_filename)
-
-    return render_template("predict.html")
-
+# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
